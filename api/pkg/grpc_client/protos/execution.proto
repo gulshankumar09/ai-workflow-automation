@@ -1,0 +1,176 @@
+syntax = "proto3";
+
+package ai-workflow-automation.execution.v1;
+
+option go_package = "github.com/ai-workflow-automation/api-gateway/pkg/grpc_client/protos";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// Execution Service Definition
+service ExecutionService {
+  // Execute a workflow
+  rpc ExecuteWorkflow(ExecuteWorkflowRequest) returns (ExecuteWorkflowResponse);
+  
+  // Stream workflow execution progress
+  rpc StreamWorkflowExecution(ExecuteWorkflowRequest) returns (stream ExecutionUpdate);
+  
+  // Get execution status
+  rpc GetExecutionStatus(GetExecutionStatusRequest) returns (GetExecutionStatusResponse);
+  
+  // Cancel execution
+  rpc CancelExecution(CancelExecutionRequest) returns (CancelExecutionResponse);
+  
+  // List user executions
+  rpc ListExecutions(ListExecutionsRequest) returns (ListExecutionsResponse);
+  
+  // Get execution logs
+  rpc GetExecutionLogs(GetExecutionLogsRequest) returns (GetExecutionLogsResponse);
+}
+
+// Request Messages
+message ExecuteWorkflowRequest {
+  string workflow_id = 1;
+  string user_id = 2;
+  bool test_mode = 3;
+  string correlation_id = 4;
+  google.protobuf.Struct parameters = 5;
+  bool stream_progress = 6;
+}
+
+message GetExecutionStatusRequest {
+  string execution_id = 1;
+  string user_id = 2;
+  string correlation_id = 3;
+}
+
+message CancelExecutionRequest {
+  string execution_id = 1;
+  string user_id = 2;
+  string correlation_id = 3;
+  string reason = 4;
+}
+
+message ListExecutionsRequest {
+  string user_id = 1;
+  string workflow_id = 2; // Optional filter
+  string status = 3; // Optional filter
+  int32 limit = 4;
+  int32 offset = 5;
+  string correlation_id = 6;
+}
+
+message GetExecutionLogsRequest {
+  string execution_id = 1;
+  string user_id = 2;
+  string correlation_id = 3;
+  int32 limit = 4;
+  int32 offset = 5;
+}
+
+// Response Messages
+message ExecuteWorkflowResponse {
+  string execution_id = 1;
+  string status = 2;
+  string error_message = 3;
+  string correlation_id = 4;
+  ExecutionMetadata metadata = 5;
+}
+
+message ExecutionUpdate {
+  string execution_id = 1;
+  string step_id = 2;
+  string step_name = 3;
+  string type = 4; // "step_start", "step_complete", "step_error", "execution_complete"
+  string status = 5;
+  string message = 6;
+  float progress_percentage = 7;
+  google.protobuf.Timestamp timestamp = 8;
+  google.protobuf.Struct data = 9;
+  string error = 10;
+}
+
+message GetExecutionStatusResponse {
+  ExecutionResult execution = 1;
+  string status = 2;
+  string error_message = 3;
+  string correlation_id = 4;
+}
+
+message CancelExecutionResponse {
+  bool success = 1;
+  string status = 2;
+  string error_message = 3;
+  string correlation_id = 4;
+}
+
+message ListExecutionsResponse {
+  repeated ExecutionResult executions = 1;
+  int32 total_count = 2;
+  string status = 3;
+  string error_message = 4;
+  string correlation_id = 5;
+}
+
+message GetExecutionLogsResponse {
+  repeated ExecutionLog logs = 1;
+  int32 total_count = 2;
+  string status = 3;
+  string error_message = 4;
+  string correlation_id = 5;
+}
+
+// Data Models
+message ExecutionResult {
+  string execution_id = 1;
+  string workflow_id = 2;
+  string user_id = 3;
+  string status = 4; // "pending", "running", "completed", "failed", "cancelled"
+  repeated StepResult step_results = 5;
+  repeated ExecutionError errors = 6;
+  float execution_time_seconds = 7;
+  google.protobuf.Timestamp started_at = 8;
+  google.protobuf.Timestamp completed_at = 9;
+  bool test_mode = 10;
+  ExecutionMetadata metadata = 11;
+}
+
+message StepResult {
+  string step_id = 1;
+  string step_name = 2;
+  string tool_name = 3;
+  string status = 4; // "waiting", "running", "completed", "failed", "skipped", "retrying"
+  google.protobuf.Struct result = 5;
+  float execution_time = 6;
+  google.protobuf.Timestamp timestamp = 7;
+  int32 retry_count = 8;
+  string error_message = 9;
+}
+
+message ExecutionError {
+  string step_id = 1;
+  string type = 2;
+  string message = 3;
+  google.protobuf.Struct details = 4;
+  google.protobuf.Timestamp timestamp = 5;
+  int32 retry_count = 6;
+}
+
+message ExecutionLog {
+  string id = 1;
+  string execution_id = 2;
+  string step_id = 3;
+  string status = 4;
+  string message = 5;
+  google.protobuf.Struct log_data = 6;
+  google.protobuf.Timestamp timestamp = 7;
+}
+
+message ExecutionMetadata {
+  int32 total_steps = 1;
+  int32 completed_steps = 2;
+  int32 failed_steps = 3;
+  float success_rate = 4;
+  google.protobuf.Struct workflow_metadata = 5;
+  repeated string parallel_groups = 6;
+} 

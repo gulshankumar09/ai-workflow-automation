@@ -1,0 +1,712 @@
+definitions:
+  models.ChatMessage:
+    properties:
+      content:
+        type: string
+      message_id:
+        type: string
+      message_type:
+        type: string
+      metadata:
+        additionalProperties: true
+        type: object
+      session_id:
+        type: string
+      timestamp:
+        type: string
+      tool_calls:
+        items:
+          $ref: '#/definitions/models.ToolCall'
+        type: array
+    type: object
+  models.ChatMessageResponse:
+    properties:
+      content:
+        type: string
+      is_final:
+        type: boolean
+      message_id:
+        type: string
+      message_type:
+        type: string
+      metadata:
+        additionalProperties: true
+        type: object
+      session_id:
+        type: string
+      status:
+        type: string
+      timestamp:
+        type: string
+      tool_calls:
+        items:
+          $ref: '#/definitions/models.ToolCall'
+        type: array
+    type: object
+  models.CreateUserRequest:
+    properties:
+      auth_id:
+        type: string
+      avatar_url:
+        type: string
+      email:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - auth_id
+    type: object
+  models.CreateUserResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+      user:
+        $ref: '#/definitions/models.UserDetails'
+    type: object
+  models.DeleteUserResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  models.EndChatSessionRequest:
+    properties:
+      reason:
+        maxLength: 500
+        type: string
+    type: object
+  models.EndChatSessionResponse:
+    properties:
+      ended_at:
+        type: string
+      message:
+        type: string
+      session_id:
+        type: string
+      status:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      code:
+        type: string
+      correlation_id:
+        type: string
+      details:
+        additionalProperties: true
+        type: object
+      error:
+        type: string
+      message:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  models.GetChatHistoryResponse:
+    properties:
+      has_more:
+        type: boolean
+      messages:
+        items:
+          $ref: '#/definitions/models.ChatMessage'
+        type: array
+      next_cursor:
+        type: string
+      total_count:
+        type: integer
+    type: object
+  models.GetSessionContextResponse:
+    properties:
+      active_tools:
+        items:
+          type: string
+        type: array
+      context:
+        additionalProperties: true
+        type: object
+      metrics:
+        $ref: '#/definitions/models.SessionMetrics'
+      session_id:
+        type: string
+      status:
+        type: string
+    type: object
+  models.GetUserResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+      user:
+        $ref: '#/definitions/models.UserDetails'
+    type: object
+  models.SendMessageRequest:
+    properties:
+      message:
+        maxLength: 10000
+        minLength: 1
+        type: string
+      message_type:
+        enum:
+        - user
+        - assistant
+        - system
+        - tool_call
+        - tool_result
+        type: string
+      metadata:
+        additionalProperties: true
+        type: object
+      stream:
+        type: boolean
+    required:
+    - message
+    type: object
+  models.SessionMetrics:
+    properties:
+      message_count:
+        type: integer
+      session_duration:
+        type: string
+      tokens_used:
+        type: integer
+      tool_calls_count:
+        type: integer
+    type: object
+  models.StartChatSessionRequest:
+    properties:
+      capabilities:
+        items:
+          type: string
+        type: array
+      context:
+        additionalProperties: true
+        type: object
+      session_type:
+        enum:
+        - workflow
+        - chat
+        - tool_discovery
+        - assistance
+        type: string
+    required:
+    - session_type
+    type: object
+  models.StartChatSessionResponse:
+    properties:
+      available_tools:
+        items:
+          type: string
+        type: array
+      context:
+        additionalProperties: true
+        type: object
+      message:
+        type: string
+      session_id:
+        type: string
+      status:
+        type: string
+    type: object
+  models.ToolCall:
+    properties:
+      arguments:
+        additionalProperties: true
+        type: object
+      result:
+        type: string
+      status:
+        type: string
+      timestamp:
+        type: string
+      tool_id:
+        type: string
+      tool_name:
+        type: string
+    type: object
+  models.UpdateUserRequest:
+    properties:
+      avatar_url:
+        type: string
+      email:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+    type: object
+  models.UpdateUserResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+      user:
+        $ref: '#/definitions/models.UserDetails'
+    type: object
+  models.UserDetails:
+    properties:
+      auth_id:
+        type: string
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8082
+info:
+  contact:
+    email: support@ai-workflow-automation.com
+    name: API Support
+    url: http://www.ai-workflow-automation.com/support
+  description: API Gateway for ai-workflow-automation Dynamic Workflow Generation System
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: ai-workflow-automation API Gateway
+  version: "1.0"
+paths:
+  /api/info:
+    get:
+      description: Get API gateway service information and available endpoints
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: API information
+          schema:
+            additionalProperties: true
+            type: object
+      summary: API Gateway Information
+      tags:
+      - public
+  /api/test:
+    get:
+      description: Public test endpoint to verify API connectivity (no authentication
+        required)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Test response
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Test Endpoint
+      tags:
+      - public
+  /api/v1/chat/sessions:
+    post:
+      consumes:
+      - application/json
+      description: Create a new chat session with specified type and context
+      parameters:
+      - description: Chat session request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.StartChatSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StartChatSessionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Start a new chat session
+      tags:
+      - chat
+  /api/v1/chat/sessions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Terminate a chat session and optionally provide a reason
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: End session request with optional reason
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/models.EndChatSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EndChatSessionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: End a chat session
+      tags:
+      - chat
+    get:
+      consumes:
+      - application/json
+      description: Retrieve current context and status of a chat session
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetSessionContextResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get chat session context
+      tags:
+      - chat
+  /api/v1/chat/sessions/{id}/history:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve message history for a chat session with pagination
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Number of messages to retrieve (default: 50, max: 100)'
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination cursor for next page
+        in: query
+        name: cursor
+        type: string
+      - description: Start time filter (RFC3339 format)
+        in: query
+        name: start_time
+        type: string
+      - description: End time filter (RFC3339 format)
+        in: query
+        name: end_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetChatHistoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get chat session history
+      tags:
+      - chat
+  /api/v1/chat/sessions/{id}/messages:
+    post:
+      consumes:
+      - application/json
+      description: Send a message to a chat session and optionally receive streaming
+        response
+      parameters:
+      - description: Session ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Message request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SendMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ChatMessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Send a message in a chat session
+      tags:
+      - chat
+  /api/v1/users:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user in the system
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CreateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new user
+      tags:
+      - users
+  /api/v1/users/{id}:
+    delete:
+      description: Delete a user from the system (admin only)
+      parameters:
+      - description: User UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DeleteUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - users
+  /api/v1/users/me:
+    get:
+      description: Get the profile of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetUserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update the profile of the currently authenticated user
+      parameters:
+      - description: Updated user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UpdateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update current user profile
+      tags:
+      - users
+  /health:
+    get:
+      description: Returns the health status of the API Gateway
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health check endpoint
+      tags:
+      - health
+  /health/live:
+    get:
+      description: Checks if the API Gateway is alive
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Liveness probe endpoint
+      tags:
+      - health
+  /health/ready:
+    get:
+      description: Checks if the API Gateway is ready to handle requests (including
+        gRPC connectivity)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "503":
+          description: Service Unavailable
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Readiness probe endpoint
+      tags:
+      - health
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -1,0 +1,87 @@
+# ==========================================
+# 1. Python & Core Runtime
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+MANIFEST
+.pytest_cache/
+.cache/
+
+# ==========================================
+# 2. Virtual Environments & Package Managers
+# ==========================================
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+__pypackages__/
+node_modules/
+.npm
+
+# We intentionally do NOT ignore Pipfile.lock or uv.lock 
+# to ensure reproducible builds in your automation workflows.
+
+# ==========================================
+# 3. Environment Variables & Secrets (CRITICAL for AI/APIs)
+# ==========================================
+.env.local
+.env.development
+.env.production
+*.pem
+*.key
+*.crt
+*.csr
+
+# ==========================================
+# 4. Databases & Caching (Redis/Sqlite)
+# ==========================================
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+dump.rdb
+*.sql.gz
+
+# ==========================================
+# 5. Local IDEs & OS Junk
+# ==========================================
+.idea/
+.vscode/
+*.sublime-*
+*.code-workspace
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# 6. Project Specific Logs & Temporary Data
+# ==========================================
+logs/
+*.log
+pids
+*.pid
+*.seed
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.backup
+profile_*.prof
+*.prof
+
+# ==========================================
+# 7. Media & Application Uploads
+# ==========================================
+uploads/
+downloads/
+temp/
+tmp/
+media/

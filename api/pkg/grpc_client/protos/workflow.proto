@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+package ai-workflow-automation.workflow.v1;
+
+option go_package = "github.com/ai-workflow-automation/api-gateway/pkg/grpc_client/protos";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// Workflow Service Definition
+service WorkflowService {
+  // Generate a new workflow from natural language request
+  rpc GenerateWorkflow(GenerateWorkflowRequest) returns (GenerateWorkflowResponse);
+  
+  // Generate workflow with streaming progress updates
+  rpc GenerateWorkflowStream(GenerateWorkflowRequest) returns (stream WorkflowGenerationProgress);
+  
+  // Get workflow by ID
+  rpc GetWorkflow(GetWorkflowRequest) returns (GetWorkflowResponse);
+  
+  // List user workflows
+  rpc ListWorkflows(ListWorkflowsRequest) returns (ListWorkflowsResponse);
+  
+  // Update workflow status
+  rpc UpdateWorkflow(UpdateWorkflowRequest) returns (UpdateWorkflowResponse);
+  
+  // Delete workflow
+  rpc DeleteWorkflow(DeleteWorkflowRequest) returns (DeleteWorkflowResponse);
+  
+  // Validate workflow definition
+  rpc ValidateWorkflow(ValidateWorkflowRequest) returns (ValidateWorkflowResponse);
+}
+
+// Generation stages for streaming workflow creation
+enum GenerationStage {
+  STAGE_UNSPECIFIED = 0;
+  STAGE_PARSING_INTENT = 1;
+  STAGE_DISCOVERING_TOOLS = 2;
+  STAGE_GENERATING_STEPS = 3;
+  STAGE_OPTIMIZING_WORKFLOW = 4;
+  STAGE_VALIDATING = 5;
+  STAGE_COMPLETE = 6;
+  STAGE_ERROR = 7;
+}
+
+// Streaming progress message for workflow generation
+message WorkflowGenerationProgress {
+  GenerationStage stage = 1;
+  float progress_percentage = 2;
+  string message = 3;
+  string details = 4;
+  int64 estimated_time_remaining_ms = 5;
+  WorkflowDefinition partial_workflow = 6;
+  bool is_complete = 7;
+  string error_message = 8;
+}
+
+// Request Messages
+message GenerateWorkflowRequest {
+  string user_id = 1;
+  string user_request = 2;
+  google.protobuf.Struct context = 3;
+  string correlation_id = 4;
+  bool test_mode = 5;
+}
+
+message GetWorkflowRequest {
+  string workflow_id = 1;
+  string user_id = 2;
+  string correlation_id = 3;
+}
+
+message ListWorkflowsRequest {
+  string user_id = 1;
+  string status = 2; // Optional filter by status
+  int32 limit = 3;
+  int32 offset = 4;
+  string correlation_id = 5;
+}
+
+message UpdateWorkflowRequest {
+  string workflow_id = 1;
+  string user_id = 2;
+  string new_status = 3;
+  google.protobuf.Struct updates = 4;
+  string correlation_id = 5;
+}
+
+message DeleteWorkflowRequest {
+  string workflow_id = 1;
+  string user_id = 2;
+  string correlation_id = 3;
+}
+
+message ValidateWorkflowRequest {
+  WorkflowDefinition workflow = 1;
+  string user_id = 2;
+  string correlation_id = 3;
+}
+
+// Response Messages
+message GenerateWorkflowResponse {
+  string workflow_id = 1;
+  WorkflowDefinition definition = 2;
+  repeated WorkflowStep steps = 3;
+  string status = 4;
+  string error_message = 5;
+  string correlation_id = 6;
+  GenerationMetadata metadata = 7;
+}
+
+message GetWorkflowResponse {
+  WorkflowDefinition workflow = 1;
+  string status = 2;
+  string error_message = 3;
+  string correlation_id = 4;
+}
+
+message ListWorkflowsResponse {
+  repeated WorkflowDefinition workflows = 1;
+  int32 total_count = 2;
+  string status = 3;
+  string error_message = 4;
+  string correlation_id = 5;
+}
+
+message UpdateWorkflowResponse {
+  bool success = 1;
+  WorkflowDefinition updated_workflow = 2;
+  string status = 3;
+  string error_message = 4;
+  string correlation_id = 5;
+}
+
+message DeleteWorkflowResponse {
+  bool success = 1;
+  string status = 2;
+  string error_message = 3;
+  string correlation_id = 4;
+}
+
+message ValidateWorkflowResponse {
+  bool is_valid = 1;
+  repeated ValidationError errors = 2;
+  repeated string warnings = 3;
+  string status = 4;
+  string correlation_id = 5;
+}
+
+// Data Models
+message WorkflowDefinition {
+  string id = 1;
+  string user_id = 2;
+  string name = 3;
+  string description = 4;
+  repeated WorkflowStep steps = 5;
+  string status = 6;
+  google.protobuf.Struct metadata = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message WorkflowStep {
+  string id = 1;
+  string name = 2;
+  string tool_name = 3;
+  google.protobuf.Struct parameters = 4;
+  repeated string dependencies = 5;
+  bool parallel_eligible = 6;
+  int32 retry_count = 7;
+  int32 max_retries = 8;
+  int32 retry_delay = 9;
+  google.protobuf.Struct metadata = 10;
+}
+
+message GenerationMetadata {
+  int32 total_steps = 1;
+  int32 tool_count = 2;
+  float generation_time_seconds = 3;
+  repeated string used_entities = 4;
+  google.protobuf.Struct parsed_intent = 5;
+}
+
+message ValidationError {
+  string field = 1;
+  string message = 2;
+  string error_code = 3;
+  google.protobuf.Struct details = 4;
+} 

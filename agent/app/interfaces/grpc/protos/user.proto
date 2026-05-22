@@ -1,0 +1,254 @@
+syntax = "proto3";
+
+package ai-workflow-automation.user;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// User Service
+service UserService {
+  // Get user profile and preferences
+  rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse);
+  
+  // Update user preferences
+  rpc UpdateUserPreferences(UpdateUserPreferencesRequest) returns (UpdateUserPreferencesResponse);
+  
+  // Get user context
+  rpc GetUserContext(GetUserContextRequest) returns (GetUserContextResponse);
+  
+  // Update user context
+  rpc UpdateUserContext(UpdateUserContextRequest) returns (UpdateUserContextResponse);
+  
+  // Get user tools and capabilities
+  rpc GetUserTools(GetUserToolsRequest) returns (GetUserToolsResponse);
+  
+  // Register new user tool
+  rpc RegisterUserTool(RegisterUserToolRequest) returns (RegisterUserToolResponse);
+  
+  // Get user activity and metrics
+  rpc GetUserActivity(GetUserActivityRequest) returns (GetUserActivityResponse);
+}
+
+// Request Messages
+
+message GetUserProfileRequest {
+  string user_id = 1;
+  bool include_preferences = 2;
+  bool include_tools = 3;
+}
+
+message UpdateUserPreferencesRequest {
+  string user_id = 1;
+  UserPreferences preferences = 2;
+  bool merge_mode = 3;
+}
+
+message GetUserContextRequest {
+  string user_id = 1;
+  string session_id = 2;
+  repeated string context_keys = 3;
+}
+
+message UpdateUserContextRequest {
+  string user_id = 1;
+  string session_id = 2;
+  google.protobuf.Struct context_updates = 3;
+  bool merge_mode = 4;
+}
+
+message GetUserToolsRequest {
+  string user_id = 1;
+  ToolCategory category = 2;
+  bool include_disabled = 3;
+}
+
+message RegisterUserToolRequest {
+  string user_id = 1;
+  UserTool tool = 2;
+  bool auto_enable = 3;
+}
+
+message GetUserActivityRequest {
+  string user_id = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+  ActivityType activity_type = 4;
+  int32 limit = 5;
+}
+
+// Response Messages
+
+message GetUserProfileResponse {
+  UserProfile profile = 1;
+  UserPreferences preferences = 2;
+  repeated UserTool tools = 3;
+  UserStatus status = 4;
+}
+
+message UpdateUserPreferencesResponse {
+  UserPreferences updated_preferences = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message GetUserContextResponse {
+  google.protobuf.Struct context = 1;
+  string session_id = 2;
+  google.protobuf.Timestamp last_updated = 3;
+}
+
+message UpdateUserContextResponse {
+  google.protobuf.Struct updated_context = 1;
+  bool success = 2;
+  string message = 3;
+}
+
+message GetUserToolsResponse {
+  repeated UserTool tools = 1;
+  int32 total_count = 2;
+  repeated ToolCategory available_categories = 3;
+}
+
+message RegisterUserToolResponse {
+  UserTool registered_tool = 1;
+  bool success = 2;
+  string message = 3;
+  string tool_id = 4;
+}
+
+message GetUserActivityResponse {
+  repeated UserActivity activities = 1;
+  UserMetrics metrics = 2;
+  bool has_more = 3;
+  string next_cursor = 4;
+}
+
+// Data Models
+
+message UserProfile {
+  string user_id = 1;
+  string email = 2;
+  string display_name = 3;
+  string avatar_url = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp last_active = 6;
+  UserStatus status = 7;
+  google.protobuf.Struct metadata = 8;
+}
+
+message UserPreferences {
+  LanguagePreference language = 1;
+  UIPreferences ui_preferences = 2;
+  WorkflowPreferences workflow_preferences = 3;
+  NotificationPreferences notification_preferences = 4;
+  SecurityPreferences security_preferences = 5;
+  google.protobuf.Struct custom_preferences = 6;
+}
+
+message UIPreferences {
+  string theme = 1;
+  string layout = 2;
+  bool enable_animations = 3;
+  int32 items_per_page = 4;
+  repeated string favorite_tools = 5;
+}
+
+message WorkflowPreferences {
+  bool auto_save_workflows = 1;
+  int32 default_timeout_seconds = 2;
+  bool enable_streaming = 3;
+  string default_model = 4;
+  repeated string preferred_tools = 5;
+}
+
+message NotificationPreferences {
+  bool email_notifications = 1;
+  bool push_notifications = 2;
+  bool workflow_completion = 3;
+  bool error_alerts = 4;
+  repeated string notification_channels = 5;
+}
+
+message SecurityPreferences {
+  bool require_mfa = 1;
+  int32 session_timeout_minutes = 2;
+  bool allow_tool_registration = 3;
+  repeated string trusted_domains = 4;
+}
+
+message UserTool {
+  string tool_id = 1;
+  string name = 2;
+  string description = 3;
+  ToolCategory category = 4;
+  google.protobuf.Struct configuration = 5;
+  bool enabled = 6;
+  google.protobuf.Timestamp registered_at = 7;
+  google.protobuf.Timestamp last_used = 8;
+  int32 usage_count = 9;
+}
+
+message UserActivity {
+  string activity_id = 1;
+  string user_id = 2;
+  ActivityType activity_type = 3;
+  string description = 4;
+  google.protobuf.Struct details = 5;
+  google.protobuf.Timestamp timestamp = 6;
+  string session_id = 7;
+}
+
+message UserMetrics {
+  int32 total_workflows = 1;
+  int32 total_executions = 2;
+  int32 total_tool_calls = 3;
+  google.protobuf.Timestamp first_activity = 4;
+  google.protobuf.Timestamp last_activity = 5;
+  int32 active_sessions = 6;
+  repeated ToolUsage tool_usage = 7;
+}
+
+message ToolUsage {
+  string tool_name = 1;
+  int32 usage_count = 2;
+  google.protobuf.Timestamp last_used = 3;
+  double success_rate = 4;
+}
+
+message LanguagePreference {
+  string code = 1;
+  string display_name = 2;
+  bool is_default = 3;
+}
+
+// Enums
+
+enum UserStatus {
+  USER_STATUS_UNSPECIFIED = 0;
+  USER_STATUS_ACTIVE = 1;
+  USER_STATUS_INACTIVE = 2;
+  USER_STATUS_SUSPENDED = 3;
+  USER_STATUS_PENDING = 4;
+}
+
+enum ToolCategory {
+  TOOL_CATEGORY_UNSPECIFIED = 0;
+  TOOL_CATEGORY_GENERAL = 1;
+  TOOL_CATEGORY_DEVELOPMENT = 2;
+  TOOL_CATEGORY_DATA_ANALYSIS = 3;
+  TOOL_CATEGORY_COMMUNICATION = 4;
+  TOOL_CATEGORY_PRODUCTIVITY = 5;
+  TOOL_CATEGORY_CUSTOM = 6;
+}
+
+enum ActivityType {
+  ACTIVITY_TYPE_UNSPECIFIED = 0;
+  ACTIVITY_TYPE_LOGIN = 1;
+  ACTIVITY_TYPE_LOGOUT = 2;
+  ACTIVITY_TYPE_WORKFLOW_CREATED = 3;
+  ACTIVITY_TYPE_WORKFLOW_EXECUTED = 4;
+  ACTIVITY_TYPE_TOOL_REGISTERED = 5;
+  ACTIVITY_TYPE_TOOL_USED = 6;
+  ACTIVITY_TYPE_PREFERENCES_UPDATED = 7;
+  ACTIVITY_TYPE_ERROR_OCCURRED = 8;
+} 

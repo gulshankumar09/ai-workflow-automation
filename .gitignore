@@ -1,0 +1,57 @@
+# ==========================================
+# 1. Operating System Junk (Applies everywhere)
+# ==========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*~
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# ==========================================
+# 2. Global IDE & Code Editor Settings
+# ==========================================
+.idea/
+.vscode/
+*.sublime-*
+*.code-workspace
+.classpath
+.project
+.settings/
+
+# ==========================================
+# 3. Root-Level Environment Variables & Secrets
+# ==========================================
+# (For when you keep global .env files at the project root)
+.env
+.env.local
+.env.development
+.env.production
+.env.sample
+.env.backup
+!*.env.example # Track template examples so your team knows what keys to fill out
+
+# ==========================================
+# 4. Shared Infrastructure & Deployment (Docker/K8s)
+# ==========================================
+# Ignore local docker overrides, but keep core dockerfiles
+docker-compose.override.yml
+*.kubeconfig
+
+# Logs & data dumps from root-level services (like a shared DB or Redis container)
+logs/
+*.log
+dump.rdb
+
+# ==========================================
+# 5. Local Database / Vector Store Cache (If running locally)
+# ==========================================
+# If your AI agent uses a local vector store like Chroma or FAISS at the root:
+data/
+.chroma/
